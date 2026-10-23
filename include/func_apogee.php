@@ -419,6 +419,9 @@ function recupSimple(
             $updates = [];
             $nbrows = $nbrows + 1;
             foreach ($row as $cle => $valeur) {
+                // Une colonne Oracle NULL devient null en PHP ; str_replace()
+                // n'accepte plus null depuis PHP 8.1 (deprecated).
+                $valeur = $valeur ?? '';
                 $valeur = str_replace(",", ".", $valeur);
 
                 // Chars to be replaced.

@@ -42,7 +42,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
         $cod_anu = filter_input(INPUT_POST, "cod_anu");
         $cycle = filter_input(INPUT_POST, "cycle");
 
-        if (strpos($RefEtp, "|") !== false) {
+        if ($RefEtp !== null && strpos($RefEtp, "|") !== false) {
             [$cod_etp_cible, $cod_vrs_vet, $comp, $cod_anu, $cycle] = explode(
                 "|",
                 $RefEtp

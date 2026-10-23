@@ -154,6 +154,10 @@ function identificationLDAP($login)
     $query = "(&(uid=" . $keyword . "))";
     $result = ldap_search($conn, $baseDN, $query);
 
+    if ($result === false) {
+        return "";
+    }
+
     // Lecture du resultat.
     $info = ldap_get_entries($conn, $result);
 
@@ -241,7 +245,7 @@ function requete($cnx_mysql, $libreq, $debug = 0, $mode = "")
                     if ($affected > 0) {
                         $totalInserted += $affected;
                     } else {
-                        report_error($cnx_mysql, $libreq);
+                        reportError($cnx_mysql, $libreq);
                     }
                 }
             } while (mysqli_more_results($cnx_mysql) && mysqli_next_result($cnx_mysql));
