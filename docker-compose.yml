@@ -1,0 +1,55 @@
+services:
+  database:
+    container_name: ${PROJECT_NAME:-apose}_database
+    image: mariadb:${DATABASE_VERSION:-10.5}
+    environment:
+      MARIADB_DATABASE: ${DATABASE_NAME:-apose}
+      MARIADB_ROOT_PASSWORD: ${DATABASE_ROOT_PASSWORD:-password}
+    entrypoint: ["/bin/bash", "/docker/mariadb-entrypoint.sh"]
+    ports:
+      - ${DATABASE_PORT:-3375}:3306
+    volumes:
+      - db-data:/var/lib/mysql:rw
+      - ./apose.sql:/apose.sql:ro
+      - ./docker/mariadb/entrypoint.sh:/docker/mariadb-entrypoint.sh:ro
+    networks:
+      - dev
+
+  phpmyadmin:
+    container_name: ${PROJECT_NAME:-apose}_phpmyadmin
+    image: phpmyadmin
+    ports:
+      - ${PHPMYADMIN_PORT:-9076}:80
+    environment:
+      PMA_HOST: database
+    depends_on:
+      - database
+    networks:
+      - dev
+
+  php:
+    container_name: ${PROJECT_NAME:-apose}_php
+    tty: true
+    build:
+      context: ./
+      dockerfile: docker/php/Dockerfile
+    environment:
+      DATABASE_HOST: database
+      DATABASE_NAME: ${DATABASE_NAME:-apose}
+      DATABASE_USER: root
+      DATABASE_PASSWORD: ${DATABASE_ROOT_PASSWORD:-password}
+      APP_BASE_URL: http://localhost:${PHP_PORT:-9075}
+    volumes:
+      - ./:/web/app
+    ports:
+      - ${PHP_PORT:-9075}:8000
+    depends_on:
+      - database
+    networks:
+      - dev
+
+networks:
+  dev:
+
+volumes:
+  db-data:
